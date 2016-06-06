@@ -1,8 +1,14 @@
 {
     "name": "webtales/alambic-connector-firebase",
     "require": {
-        "ktamas77/firebase-php":"dev-master"
+        "webtales/firebase-php":"dev-master"
     },
+    "repositories": [
+      {
+          "type": "vcs",
+          "url": "git://github.com/WebTales/firebase-php.git"
+      }
+    ],
     "autoload": {
         "psr-0": { "FirebaseConnector": "src/" }
     }
