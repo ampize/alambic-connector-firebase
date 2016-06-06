@@ -1,0 +1,9 @@
+{
+    "name": "webtales/alambic-connector-firebase",
+    "require": {
+        "ktamas77/firebase-php":"dev-master"
+    },
+    "autoload": {
+        "psr-0": { "FirebaseConnector": "src/" }
+    }
+}
