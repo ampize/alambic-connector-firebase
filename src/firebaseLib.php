@@ -190,8 +190,7 @@ class FirebaseLib implements FirebaseInterface
     private function _getCurlHandler($path, $mode, $query = NULL)
     {
         $url = $this->_getJsonPath($path);
-		$url = $query ? $url . $this->getString($query) : $url;
-
+		    $url = $query ? $url .'?'. $this->getString($query) : $url;
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_TIMEOUT, $this->_timeout);

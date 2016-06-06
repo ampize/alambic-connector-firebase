@@ -29,6 +29,7 @@ class FirebaseConnector
         $args=isset($payload["args"]) ? $payload["args"] : [];
         $basePath=$payload["configs"]["path"];
         $path=$basePath;
+
         $argsList = [];
         $needOrderBy = false;
         foreach($args as $argKey=>$argValue){
@@ -42,21 +43,17 @@ class FirebaseConnector
                     $needOrderBy = true;
                     break;
               default:
-                    $argsList["orderBy"]='"'.$argKey.'"';
+                    $argsList["orderBy"]=$argKey;
                     $argsList["equalTo"]=$argValue;
                   break;
             }
         }
         if ($needOrderBy && !isset($argsList["orderBy"])) {
-            $argsList["orderBy"] = '"$key"';
+            $argsList["orderBy"] = '$key';
         }
-        $path.=".json?";
-        foreach ($argsList as $argKey=>$argValue) {
-          $path.="&".$argKey."=".$argValue;
-        }
-        var_dump($path);
         try {
-          $result=json_decode($firebase->get($path),true);
+          $data = $firebase->get($basePath, $argsList);
+          $result=json_decode($data,true);
         } catch (Exception $exception) {
             throw new Exception($exception->getMessage());
         }
