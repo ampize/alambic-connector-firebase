@@ -1,7 +1,7 @@
 {
     "name": "webtales/alambic-connector-firebase",
     "require": {
-        "ktamas77/firebase-php":"dev-master"
+        "webtales/firebase-php":"dev-master"
     },
     "repositories": [
       {
