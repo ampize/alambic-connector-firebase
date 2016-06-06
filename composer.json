@@ -1,12 +1,13 @@
 {
     "name": "webtales/alambic-connector-firebase",
+    "minimum-stability": "dev",
     "require": {
         "webtales/firebase-php":"dev-master"
     },
     "repositories": [
       {
           "type": "vcs",
-          "url": "git://github.com/webtales/firebase-php.git"
+          "url": "git://github.com/WebTales/firebase-php.git"
       }
     ],
     "autoload": {
