@@ -6,7 +6,7 @@
     "repositories": [
       {
           "type": "vcs",
-          "url": "git://github.com/WebTales/firebase-php.git"
+          "url": "git://github.com/webtales/firebase-php.git"
       }
     ],
     "autoload": {
