@@ -8,6 +8,9 @@ class FirebaseConnector
 {
     public function __invoke($payload=[])
     {
+      if (isset($payload["response"])) {
+        return $payload;
+      }
         $configs=isset($payload["configs"]) ? $payload["configs"] : [];
         $baseConfig=isset($payload["connectorBaseConfig"]) ? $payload["connectorBaseConfig"] : [];
 
@@ -32,12 +35,24 @@ class FirebaseConnector
 
         $argsList = [];
         $needOrderBy = false;
+        $sort=null;
+        if(!empty($payload["pipelineParams"]["orderBy"])){
+            $direction=!empty($payload["pipelineParams"]["orderByDirection"])&&($payload["pipelineParams"]["orderByDirection"]==-"desc") ? -1 : 1;
+            $sort=[$payload["pipelineParams"]["orderBy"]=>$direction];
+        }
+        $start=!empty($payload["pipelineParams"]["start"]) ? $payload["pipelineParams"]["start"] : null;
+        $limit=!empty($payload["pipelineParams"]["limit"]) ? $payload["pipelineParams"]["limit"] : null;
+        if (isset($limit)) {
+          $argsList["limitToFirst"]=$limit;
+          $needOrderBy = true;
+        }
+        if (isset($start)) {
+          $argsList["startAt"]=$start;
+          $needOrderBy = true;
+        }
+
         foreach($args as $argKey=>$argValue){
             switch ($argKey) {
-                case "limitToFirst":
-                    $argsList["limitToFirst"]=$argValue;
-                    $needOrderBy = true;
-                    break;
               case "limitToLast":
                     $argsList["limitToLast"]=$argValue;
                     $needOrderBy = true;
@@ -65,7 +80,8 @@ class FirebaseConnector
             foreach ($result as $value) {
               $resultList[] = $value;
             }
-            return $resultList;
+            $payload["response"] = $resultList;
+            return $payload;
           }
         } else {
           throw new Exception("Firebase error: ".$result["error"]);

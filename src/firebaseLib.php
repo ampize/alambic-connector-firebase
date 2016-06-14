@@ -176,7 +176,15 @@ class FirebaseLib implements FirebaseInterface
 		if (!$query) return NULL;
 		$str = '';
 		foreach ($query as $key => $val) {
-			$str .= is_numeric($val) ? '&' . $key . '=' . $val : '&' . $key . '="' . $val . '"';
+      switch ($key) {
+        case "startAt":
+          $val = '"'. $val. '"';
+          break;
+        default:
+          $val = is_numeric($val) ? $val : '"' . $val . '"';
+          break;
+      }
+			$str .= '&' . $key . '=' . $val;
 		}
 		return $str;
 	}
