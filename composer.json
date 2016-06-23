@@ -1,7 +1,7 @@
 {
     "name": "webtales/alambic-connector-firebase",
     "require": {
-        "ktamas77/firebase-php": "dev-master"
+        "ktamas77/firebase-php": "@dev"
     },
     "autoload": {
         "classmap": ["src"]
