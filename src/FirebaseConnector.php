@@ -6,11 +6,14 @@ use \Exception;
 
 class FirebaseConnector
 {
+    private $_client;
+
     public function __invoke($payload=[])
     {
-      if (isset($payload["response"])) {
-        return $payload;
-      }
+
+        if (isset($payload["response"])) {
+          return $payload;
+        }
         $configs=isset($payload["configs"]) ? $payload["configs"] : [];
         $baseConfig=isset($payload["connectorBaseConfig"]) ? $payload["connectorBaseConfig"] : [];
 
@@ -18,16 +21,16 @@ class FirebaseConnector
             throw new Exception('Insufficient configuration: unable to resolve to a data path');
         }
         if (!empty($baseConfig["apiKey"])) {
-          $firebase = new \Firebase\FirebaseLib($baseConfig["databaseURL"], $baseConfig["apiKey"]);
+          $this->_client = new \Firebase\FirebaseLib($baseConfig["databaseURL"], $baseConfig["apiKey"]);
         } else {
-          $firebase = new \Firebase\FirebaseLib($baseConfig["databaseURL"]);
+          $this->_client = new \Firebase\FirebaseLib($baseConfig["databaseURL"]);
         }
 
-        return $payload["isMutation"] ? $this->execute($payload,$firebase) : $this->resolve($payload,$firebase);
+        return $payload["isMutation"] ? $this->execute($payload) : $this->resolve($payload);
 
     }
 
-    public function resolve($payload=[],$firebase){
+    public function resolve($payload=[]){
         $multivalued=isset($payload["multivalued"]) ? $payload["multivalued"] : false;
         $args=isset($payload["args"]) ? $payload["args"] : [];
         $basePath=$payload["configs"]["path"];
@@ -59,7 +62,7 @@ class FirebaseConnector
                     break;
               default:
                     $argsList["orderBy"]=$argKey;
-                    $argsList["equalTo"]=$argValue;
+                    $argsList["equalTo"]="$argValue";
                   break;
             }
         }
@@ -67,7 +70,7 @@ class FirebaseConnector
             $argsList["orderBy"] = '$key';
         }
         try {
-          $data = $firebase->get($basePath, $argsList);
+          $data = $this->_client->get($basePath, $argsList);
           $result=json_decode($data,true);
         } catch (Exception $exception) {
             throw new Exception($exception->getMessage());
@@ -77,8 +80,11 @@ class FirebaseConnector
             return $result[0];
           } else {
             $resultList = [];
-            foreach ($result as $value) {
-              $resultList[] = $value;
+            foreach ($result as $key => $value) {
+              if (isset($value)) {
+                $value["id"] = $key;
+                $resultList[] = $value;
+              }
             }
             $payload["response"] = $resultList;
             return $payload;
@@ -89,8 +95,9 @@ class FirebaseConnector
 
     }
 
-    public function execute($payload=[],$jsonArray,$filePath){
+    public function execute($payload=[]){
         $args=isset($payload["args"]) ? $payload["args"] : [];
+        $basePath=$payload["configs"]["path"];
         $methodName=isset($payload["methodName"]) ? $payload["methodName"] : null;
         if(empty($methodName)){
             throw new Exception('Firebase connector requires a valid methodName for write ops');
@@ -98,9 +105,26 @@ class FirebaseConnector
         if(empty($args["id"])){
             throw new Exception('Firebase connector id for write ops');
         }
-        $result=[];
-        // TODO
-        return $result;
+        $argsList = $args;
+        unset($argsList["id"]);
+        switch($methodName) {
+          case "update":
+            try {
+              $path = $basePath."/".$args["id"];
+              $data = $this->_client->update($path, $argsList);
+              $result=json_decode($data,true);
+            } catch (Exception $exception) {
+                throw new Exception($exception->getMessage());
+            }
+            break;
+        }
+        if (!isset($result["error"])) {
+            $result["id"] = $args["id"];
+            $payload["response"] = $result;
+            return $payload;
+        } else {
+          throw new Exception("Firebase error: ".$result["error"]);
+        }
     }
 
 }
