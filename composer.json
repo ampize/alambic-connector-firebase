@@ -1,5 +1,12 @@
 {
     "name": "ampize/alambic-connector-firebase",
+    "description": "Alambic Firebase connector",
+	"keywords": ["alambic", "firebase", "connector"],
+	"type": "library",
+	"license": "MIT",
+	"authors": [{
+		"name": "Ampize"
+	}],
     "require": {
         "ktamas77/firebase-php": "@dev"
     },
