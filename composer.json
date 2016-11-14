@@ -1,5 +1,5 @@
 {
-    "name": "webtales/alambic-connector-firebase",
+    "name": "ampize/alambic-connector-firebase",
     "require": {
         "ktamas77/firebase-php": "@dev"
     },
